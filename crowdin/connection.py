@@ -6,7 +6,7 @@ import re
 import logging
 import requests
 import fnmatch
-from __init__ import __version__
+from .__init__ import __version__
 
 logger = logging.getLogger('crowdin')
 
@@ -24,21 +24,21 @@ class Configuration(object):
         if config.get('project_identifier'):
             self.project_identifier = config['project_identifier']
         else:
-            print "Hey, it seems like project_identifier is missing in config file. " \
-                  "You need to fix it."
+            print("Hey, it seems like project_identifier is missing in config file. " \
+                  "You need to fix it.")
             exit()
         if config.get('api_key'):
             self.api_key = config['api_key']
         else:
-            print "Hey, it seems like api_key is missing in config file. " \
-                  "You need to fix it."
+            print("Hey, it seems like api_key is missing in config file. " \
+                  "You need to fix it.")
             exit()
         if 'preserve_hierarchy' in config:
             #print config['base_path']
             if config['preserve_hierarchy'] == True or config['preserve_hierarchy'] == False:
                 self.preserve_hierarchy = config['preserve_hierarchy']
             else:
-                print "Parameter `preserve_hierarchy` allows values of True or False. \n"
+                print("Parameter `preserve_hierarchy` allows values of True or False. \n")
         else:
             self.preserve_hierarchy = False
         if config.get('base_url'):
@@ -56,8 +56,8 @@ class Configuration(object):
         if config.get('files'):
             self.files_source = config['files']
         else:
-            print "Configuration file misses required section `files`" \
-                  "\n See http://crowdin.com/page/cli-tool#configuration-file for more details"
+            print("Configuration file misses required section `files`" \
+                  "\n See http://crowdin.com/page/cli-tool#configuration-file for more details")
             exit()
 
     def get_project_identifier(self):
@@ -205,7 +205,7 @@ class Configuration(object):
                     sources.append(f['translation'])
                     sources.append(parameters)
         if not sources:
-            print 'It seems that there are none files to upload. Please check your configuration'
+            print('It seems that there are none files to upload. Please check your configuration')
         return sources
 
     def android_locale_code(self, locale_code):
@@ -267,12 +267,12 @@ class Configuration(object):
                 }
                 if 'languages_mapping' in translations_params:
                     try:
-                        for i in translations_params['languages_mapping'].iteritems():
+                        for i in translations_params['languages_mapping'].items():
                             if not i[1] is None:
                                 true_key = ''.join(('%', i[0], '%'))
-                                for k, v in i[1].iteritems():
+                                for k, v in i[1].items():
                                     if l['crowdin_code'] == k:
-                                        for key, value in pattern.items():
+                                        for key, value in list(pattern.items()):
                                             if key == true_key:
                                                 pattern[key] = v
 
@@ -286,17 +286,17 @@ class Configuration(object):
                         #                 pattern[key] = patter.sub(lambda m: rep[re.escape(m.group(0))], value)
 
                     except Exception as e:
-                        print e
-                        print 'It seems that languages_mapping is not set correctly'
+                        print(e)
+                        print('It seems that languages_mapping is not set correctly')
                         exit()
                 m = re.search("%[a-z0-9_]*?%", value_translation)
                 if m.group(0) not in pattern:
-                    print 'Warning: {} is not valid variable supported by Crowdin. See ' \
-                          'http://crowdin.com/page/cli-tool#configuration-file for more details.'.format(m.group(0))
+                    print('Warning: {} is not valid variable supported by Crowdin. See ' \
+                          'http://crowdin.com/page/cli-tool#configuration-file for more details.'.format(m.group(0)))
                     exit()
                 path_lang = value_translation
-                rep = dict((re.escape(k), v) for k, v in pattern.iteritems())
-                patter = re.compile("|".join(rep.keys()))
+                rep = dict((re.escape(k), v) for k, v in pattern.items())
+                patter = re.compile("|".join(list(rep.keys())))
                 text = patter.sub(lambda m: rep[re.escape(m.group(0))], path_lang)
                 if not text in translation:
                     translation[l['crowdin_code']] = text.replace('//', '/', 1)
@@ -330,8 +330,8 @@ class Connection(Configuration):
         except requests.exceptions.ConnectionError as e:
             if self.any_options.verbose is True:
                 traceback.print_exc()
-            print "It seems that we have faced some connection problem. It's very sad, please make sure you " \
-                  "have access to internet."
+            print("It seems that we have faced some connection problem. It's very sad, please make sure you " \
+                  "have access to internet.")
             logger.warning(e.args[0].reason)
             exit()
         else:
@@ -340,7 +340,7 @@ class Connection(Configuration):
             # raise CliException(response.text)
 
             elif self.params.get("file_name"):
-                print "{0} source file: {1} - OK".format(self.params['action_type'], self.params.get("file_name"))
+                print("{0} source file: {1} - OK".format(self.params['action_type'], self.params.get("file_name")))
             else:
                 #logger.info("Operation was successful")
 
@@ -354,14 +354,14 @@ def result_handling(self):
     if data["success"] is False:
         # raise CliException(self)
         logger.info("Operation was unsuccessful")
-        print "Error code: {0}. Error message: {1}".format(data["error"]["code"], data["error"]["message"])
+        print("Error code: {0}. Error message: {1}".format(data["error"]["code"], data["error"]["message"]))
 
         if data["error"]["code"] == '3':
-            print "Seems Crowdin server API URL is not valid. Please check the " \
-                  "`api_key` parameter in the configuration file."
+            print("Seems Crowdin server API URL is not valid. Please check the " \
+                  "`api_key` parameter in the configuration file.")
         if data["error"]["code"] == '1':
-            print "Seems Crowdin project  is not valid. Please check the " \
-                  "`project_identifier` parameter in the configuration file."
+            print("Seems Crowdin project  is not valid. Please check the " \
+                  "`project_identifier` parameter in the configuration file.")
         exit()
 
 

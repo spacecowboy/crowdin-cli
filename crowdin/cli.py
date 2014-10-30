@@ -1,8 +1,8 @@
-﻿# -*- coding: utf-8 -*-
-from __init__ import __version__
+# -*- coding: utf-8 -*-
+from .__init__ import __version__
 import argparse
 import gettext
-import methods
+from . import methods
 import logging
 import os
 import sys
@@ -25,7 +25,11 @@ class Main:
         l_dir = os.path.dirname(os.path.realpath(__file__)) + "/locales"
 
         loc = gettext.translation('cli', l_dir, languages=['en'])
-        _ = loc.ugettext
+        try:
+            _ = loc.ugettext
+        except AttributeError:
+            # Running in Python3
+            _ = loc.gettext
         loc.install()
         #print "__init__ cli"
 
@@ -155,11 +159,11 @@ VERSION:
             try:
                 config = yaml.load(fh)
             except yaml.YAMLError as e:
-                print e, '\n Could not parse YAML. ' \
+                print(e, '\n Could not parse YAML. ' \
                          'We were unable to successfully parse the crowdin.yaml file that you provided - ' \
                          'it most likely is not well-formed YAML. ' \
                          '\n Please check whether your crowdin.yaml is valid YAML - you can use ' \
-                         'the http://yamllint.com/ validator to do this - and make any necessary changes to fix it.'
+                         'the http://yamllint.com/ validator to do this - and make any necessary changes to fix it.')
                 exit()
             if os.path.isfile(home):
                 fhh = open(home, "r")
@@ -172,9 +176,9 @@ VERSION:
             #print "I'M robot method open file"
             fh.close()
         except(OSError, IOError) as e:
-            print e, 'Can''t find configuration file (default `crowdin.yaml`). Type `crowdin-cli-py help` ' \
+            print(e, 'Can''t find configuration file (default `crowdin.yaml`). Type `crowdin-cli-py help` ' \
                      'to know how to specify custom configuration file See ' \
-                     'http://crowdin.com/page/cli-tool#configuration-file for more details'
+                     'http://crowdin.com/page/cli-tool#configuration-file for more details')
             exit()
         else:
             return config

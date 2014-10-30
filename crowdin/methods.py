@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-from connection import Connection, Configuration
+from .connection import Connection, Configuration
 import logging
 import json
 import zipfile
@@ -110,7 +110,7 @@ class Methods:
                 api_files = {'files[{0}]'.format(sources): f}
                 return self.true_connection(url, params, api_files)
         except(OSError, IOError) as e:
-            print e, "\n Skipped"
+            print(e, "\n Skipped")
 
     def update_files(self, files, export_patterns, parameters, item):
         # POST https://api.crowdin.com/api/project/{project-identifier}/update-file?key={project-key}
@@ -139,7 +139,7 @@ class Methods:
                 #print files
                 return self.true_connection(url, params, api_files)
         except(OSError, IOError) as e:
-            print e, "\n Skipped"
+            print(e, "\n Skipped")
 
     def upload_translations_files(self, translations, language, source_file, parameters):
         # POST https://api.crowdin.com/api/project/{project-identifier}/upload-translation?key={project-key
@@ -160,7 +160,7 @@ class Methods:
                 #print files
                 return self.true_connection(url, params, api_files)
         except(OSError, IOError) as e:
-            print e, "\n Skipped"
+            print(e, "\n Skipped")
 
     def preserve_hierarchy(self, common_path):
         preserve_hierarchy = Configuration(self.options_config).preserve_hierarchy
@@ -242,7 +242,7 @@ class Methods:
         translations_parameters = info2[2::3]
 
         for i, source_file, params in zip(translations_language, translations_path, translations_parameters):
-            for language, item in i.iteritems():
+            for language, item in i.items():
                 if params.get('dest'):
                     if '/' in item:
                         items = source_file[source_file.rfind("/"):]
@@ -310,26 +310,26 @@ class Methods:
         params = {'json': 'json'}
         data = json.loads(self.true_connection(url, params))
         if data["success"]["status"] == 'built':
-            print "- OK"
+            print("- OK")
         elif data["success"]["status"] == 'skipped':
-            print "- Skipped"
-            print "Warning: Export was skipped. Please note that this method can be invoked only once per 30 minutes."
+            print("- Skipped")
+            print("Warning: Export was skipped. Please note that this method can be invoked only once per 30 minutes.")
 
     def list_project_files(self):
         #print self.any_options
         if self.any_options.sources == 'project':
             project_files = self.parse(self.get_info())
             for i in project_files:
-                print i
+                print(i)
         if self.any_options.sources == 'sources':
             sources_files = Configuration(self.options_config).get_files_source()
             for i in sources_files[::3]:
-                print i
+                print(i)
         if self.any_options.sources == 'translations':
             translations_file = Configuration(self.options_config).export_pattern_to_path(self.lang())
             for i in translations_file[1::3]:
-                for key, value in i.iteritems():
-                    print value
+                for key, value in i.items():
+                    print(value)
 
     def test(self):
-        print Configuration(self.options_config).get_files_source()
+        print(Configuration(self.options_config).get_files_source())
